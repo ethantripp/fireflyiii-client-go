@@ -519,15 +519,17 @@ type FireflyClient struct {
 
 // TransactionModel represents a financial transaction in our domain model
 type TransactionModel struct {
-	ID              string
-	Currency        string
-	Amount          float64
-	TransType       string // "deposit" or "withdrawal"
-	Description     string
-	Date            time.Time
-	Category        string
-	ForeignAmount   *float64
-	ForeignCurrency *string
+	ID                   string
+	Currency             string
+	Amount               float64
+	TransType            string // "deposit" or "withdrawal"
+	Description          string
+	Date                 time.Time
+	Category             string
+	ForeignAmount        *float64
+	ForeignCurrency      *string
+	SourceAccountID      *string
+	DestinationAccountID *string
 }
 
 // AccountModel represents a financial account
@@ -1079,12 +1081,14 @@ func (c *FireflyClient) ImportTransaction(ctx context.Context, tx TransactionMod
 		ApplyRules:           boolPtr(true),
 		Transactions: []TransactionSplitStore{
 			{
-				Type:         txType,
-				Date:         tx.Date,
-				Amount:       fmt.Sprintf("%.2f", tx.Amount),
-				Description:  tx.Description,
-				CurrencyCode: stringPtr(tx.Currency),
-				CategoryName: &tx.Category,
+				Type:          txType,
+				Date:          tx.Date,
+				Amount:        fmt.Sprintf("%.2f", tx.Amount),
+				Description:   tx.Description,
+				CurrencyCode:  stringPtr(tx.Currency),
+				CategoryName:  &tx.Category,
+				SourceId:      tx.SourceAccountID,
+				DestinationId: tx.DestinationAccountID,
 			},
 		},
 	}
@@ -1129,12 +1133,14 @@ func (c *FireflyClient) ImportTransactions(ctx context.Context, transactions []T
 	for i, tx := range transactions {
 		txType := TransactionTypeProperty(tx.TransType)
 		splits[i] = TransactionSplitStore{
-			Type:         txType,
-			Date:         tx.Date,
-			Amount:       fmt.Sprintf("%.2f", tx.Amount),
-			Description:  tx.Description,
-			CurrencyCode: stringPtr(tx.Currency),
-			CategoryName: &tx.Category,
+			Type:          txType,
+			Date:          tx.Date,
+			Amount:        fmt.Sprintf("%.2f", tx.Amount),
+			Description:   tx.Description,
+			CurrencyCode:  stringPtr(tx.Currency),
+			CategoryName:  &tx.Category,
+			SourceId:      tx.SourceAccountID,
+			DestinationId: tx.DestinationAccountID,
 		}
 
 		// Handle foreign amount if present
