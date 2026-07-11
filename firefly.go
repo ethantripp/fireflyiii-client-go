@@ -1081,13 +1081,14 @@ func (c *FireflyClient) ImportTransaction(ctx context.Context, tx TransactionMod
 		ApplyRules:           boolPtr(true),
 		Transactions: []TransactionSplitStore{
 			{
-				Type:         txType,
-				Date:         tx.Date,
-				Amount:       fmt.Sprintf("%.2f", tx.Amount),
-				Description:  tx.Description,
-				CurrencyCode: stringPtr(tx.Currency),
-				CategoryName: &tx.Category,
-				SourceAcc
+				Type:          txType,
+				Date:          tx.Date,
+				Amount:        fmt.Sprintf("%.2f", tx.Amount),
+				Description:   tx.Description,
+				CurrencyCode:  stringPtr(tx.Currency),
+				CategoryName:  &tx.Category,
+				SourceId:      tx.SourceAccountID,
+				DestinationId: tx.DestinationAccountID,
 			},
 		},
 	}
@@ -1132,14 +1133,14 @@ func (c *FireflyClient) ImportTransactions(ctx context.Context, transactions []T
 	for i, tx := range transactions {
 		txType := TransactionTypeProperty(tx.TransType)
 		splits[i] = TransactionSplitStore{
-			Type:                 txType,
-			Date:                 tx.Date,
-			Amount:               fmt.Sprintf("%.2f", tx.Amount),
-			Description:          tx.Description,
-			CurrencyCode:         stringPtr(tx.Currency),
-			CategoryName:         &tx.Category,
-			SourceAccountID:      &tx.SourceAccountID,
-			DestinationAccountID: &tx.DestinationAccountID
+			Type:          txType,
+			Date:          tx.Date,
+			Amount:        fmt.Sprintf("%.2f", tx.Amount),
+			Description:   tx.Description,
+			CurrencyCode:  stringPtr(tx.Currency),
+			CategoryName:  &tx.Category,
+			SourceId:      tx.SourceAccountID,
+			DestinationId: tx.DestinationAccountID,
 		}
 
 		// Handle foreign amount if present
